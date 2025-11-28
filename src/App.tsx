@@ -14,7 +14,7 @@ function App() {
   const [mode, setMode] = useState<GameMode>("standard")
   const [touchPoints, setTouchPoints] = useState<TouchPoint[]>([])
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [selectedTeam, setSelectedTeam] = useState<number | null>(null)
+  const [_selectedTeam, setSelectedTeam] = useState<number | null>(null)
   const [countdown, setCountdown] = useState(COUNTDOWN_START)
   const [showMenu, setShowMenu] = useState(true)
   const [teamConfig, setTeamConfig] = useState<TeamConfig>({
@@ -44,6 +44,8 @@ function App() {
     setSelectedId(null)
     setSelectedTeam(null)
     setCountdown(COUNTDOWN_START)
+    setTouchPoints([])
+    previousTouchCountRef.current = 0
     simulatedTouchesRef.current = []
   }, [clearCountdown])
 
@@ -194,7 +196,7 @@ function App() {
 
   if (showMenu) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+      <main className="min-h-screen bg-[#050508]">
         <ModeSelector
           mode={mode}
           onModeChange={setMode}
@@ -213,7 +215,7 @@ function App() {
       : touchPoints
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+    <main className="min-h-screen bg-[#050508] overflow-hidden relative">
       <TouchArea
         touchPoints={allTouchPoints}
         onTouchChange={handleTouchChange}
@@ -225,40 +227,11 @@ function App() {
 
       <Countdown count={countdown} isVisible={phase === "countdown"} />
 
-      {/* Status overlay */}
-      <div className="fixed top-0 left-0 right-0 p-4 flex justify-between items-center z-40 pointer-events-none">
-        <div className="px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-sm border border-cyan-400/30">
-          <span className="text-cyan-400 text-sm font-medium">
-            {phase === "waiting" && (
-              <>
-                {mode === "single"
-                  ? "Tap anywhere to join"
-                  : `Need ${minPlayers}+ players`}
-              </>
-            )}
-            {phase === "ready" && "Hold still..."}
-            {phase === "countdown" && "Selecting..."}
-            {phase === "result" && (
-              <>
-                {mode === "team" && selectedTeam !== null
-                  ? `Team ${selectedTeam + 1} Goes First!`
-                  : "Winner!"}
-              </>
-            )}
-          </span>
-        </div>
-        <div className="px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-sm border border-fuchsia-400/30">
-          <span className="text-fuchsia-400 text-sm font-medium">
-            {allTouchPoints.length} player{allTouchPoints.length !== 1 ? "s" : ""}
-          </span>
-        </div>
-      </div>
-
       {/* Back button */}
       <div className="fixed bottom-4 left-4 z-40">
         <button
           onClick={handleRestart}
-          className="px-3 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-sm border border-slate-600/50 text-slate-400 hover:text-slate-200 hover:border-slate-500 text-sm transition-colors"
+          className="px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm border border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-600 text-sm transition-colors"
         >
           ← Menu
         </button>

@@ -6,6 +6,7 @@ interface NeonButtonProps {
   color?: "cyan" | "pink" | "green"
   size?: "sm" | "md" | "lg"
   disabled?: boolean
+  className?: string
 }
 
 const colorStyles = {
@@ -47,6 +48,7 @@ export function NeonButton({
   color = "cyan",
   size = "md",
   disabled = false,
+  className = "",
 }: NeonButtonProps) {
   const colors = colorStyles[color]
 
@@ -60,6 +62,7 @@ export function NeonButton({
         transition-all duration-300 ease-out
         ${sizeStyles[size]}
         ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-105 active:scale-95"}
+        ${className}
       `}
       style={{
         border: `2px solid ${colors.border}`,

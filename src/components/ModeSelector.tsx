@@ -9,6 +9,14 @@ interface ModeSelectorProps {
   onStart: () => void
 }
 
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen()
+  } else {
+    document.exitFullscreen()
+  }
+}
+
 export function ModeSelector({
   mode,
   onModeChange,
@@ -16,12 +24,18 @@ export function ModeSelector({
   onTeamConfigChange,
   onStart,
 }: ModeSelectorProps) {
+  const isTeamMode = mode === "team"
+  const showTeamCountControl =
+    isTeamMode && teamConfig.groupingMode === "byTeamCount"
+  const showPlayerCountControl =
+    isTeamMode && teamConfig.groupingMode === "byPlayerCount"
+
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center z-50 p-6">
+    <div className="fixed inset-0 flex flex-col z-50 p-6">
       {/* Animated background */}
       <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-15"
           style={{
             backgroundImage: `
               radial-gradient(circle at 20% 30%, rgba(0, 240, 255, 0.3) 0%, transparent 40%),
@@ -32,145 +46,156 @@ export function ModeSelector({
         />
       </div>
 
-      <div className="relative z-10 max-w-md w-full space-y-8">
-        {/* Title */}
-        <div className="text-center">
-          <h1
-            className="text-4xl md:text-5xl font-bold mb-2"
-            style={{
-              background: "linear-gradient(135deg, #00f0ff 0%, #bf00ff 50%, #ff00aa 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              filter: "drop-shadow(0 0 20px rgba(0, 240, 255, 0.5))",
-            }}
+      <div className="relative z-10 flex flex-col flex-1 max-w-md w-full mx-auto">
+        {/* Top section - Title and Mode Selection (anchored to top) */}
+        <div className="space-y-8 pt-8">
+          {/* Title */}
+          <div className="text-center">
+            <h1
+              className="text-4xl md:text-5xl font-bold py-16"
+              style={{
+                background:
+                  "linear-gradient(135deg, #00f0ff 0%, #bf00ff 50%, #ff00aa 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                filter: "drop-shadow(0 0 20px rgba(0, 240, 255, 0.5))",
+              }}
+            >
+              Player Picker
+            </h1>
+          </div>
+
+          {/* Mode Selection - 2x2 Grid */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              {/* Top row */}
+              <ModeButton
+                active={mode === "standard"}
+                onClick={() => onModeChange("standard")}
+                label="Standard"
+                description="Pick one player"
+              />
+              <ModeButton
+                active={mode === "single"}
+                onClick={() => onModeChange("single")}
+                label="Solo"
+                description="Practice mode"
+              />
+              {/* Bottom row - Team options */}
+              <ModeButton
+                active={showTeamCountControl}
+                onClick={() => {
+                  onModeChange("team")
+                  onTeamConfigChange({
+                    ...teamConfig,
+                    groupingMode: "byTeamCount",
+                  })
+                }}
+                label="Team Count"
+                description="Split into X teams"
+              />
+              <ModeButton
+                active={showPlayerCountControl}
+                onClick={() => {
+                  onModeChange("team")
+                  onTeamConfigChange({
+                    ...teamConfig,
+                    groupingMode: "byPlayerCount",
+                  })
+                }}
+                label="Team Size"
+                description="X players per team"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Middle section - Numeric selector (fills remaining space, content at top) */}
+        <div className="flex-1 pt-6">
+          <div
+            className={`
+              flex items-center justify-center gap-4 rounded-lg border bg-purple-950/30
+              transition-all duration-300 ease-in-out
+              ${isTeamMode 
+                ? "opacity-100 h-14 py-2 px-4 border-purple-500/30" 
+                : "opacity-0 h-0 py-0 px-4 border-transparent overflow-hidden"}
+            `}
           >
-            Player Picker
-          </h1>
-          <p className="text-cyan-400/70 text-sm">Choose who goes first</p>
-        </div>
-
-        {/* Mode Selection */}
-        <div className="space-y-4">
-          <h2 className="text-cyan-400 text-lg font-semibold text-center">Select Mode</h2>
-          <div className="grid grid-cols-3 gap-3">
-            <ModeButton
-              active={mode === "standard"}
-              onClick={() => onModeChange("standard")}
-              label="Standard"
-              description="Pick one player"
-            />
-            <ModeButton
-              active={mode === "single"}
-              onClick={() => onModeChange("single")}
-              label="Solo"
-              description="Practice mode"
-            />
-            <ModeButton
-              active={mode === "team"}
-              onClick={() => onModeChange("team")}
-              label="Teams"
-              description="Group players"
-            />
+            <button
+              onClick={() => {
+                if (showTeamCountControl) {
+                  onTeamConfigChange({
+                    ...teamConfig,
+                    teamCount: Math.max(2, teamConfig.teamCount - 1),
+                  })
+                } else {
+                  onTeamConfigChange({
+                    ...teamConfig,
+                    playersPerTeam: Math.max(2, teamConfig.playersPerTeam - 1),
+                  })
+                }
+              }}
+              className="w-10 h-10 rounded-full border border-purple-400 text-purple-400 text-xl hover:bg-purple-400/20 transition-colors"
+            >
+              -
+            </button>
+            <div className="text-3xl font-bold text-purple-400 w-16 text-center">
+              {showTeamCountControl
+                ? teamConfig.teamCount
+                : teamConfig.playersPerTeam}
+            </div>
+            <button
+              onClick={() => {
+                if (showTeamCountControl) {
+                  onTeamConfigChange({
+                    ...teamConfig,
+                    teamCount: Math.min(10, teamConfig.teamCount + 1),
+                  })
+                } else {
+                  onTeamConfigChange({
+                    ...teamConfig,
+                    playersPerTeam: Math.min(10, teamConfig.playersPerTeam + 1),
+                  })
+                }
+              }}
+              className="w-10 h-10 rounded-full border border-purple-400 text-purple-400 text-xl hover:bg-purple-400/20 transition-colors"
+            >
+              +
+            </button>
           </div>
         </div>
 
-        {/* Team Configuration */}
-        {mode === "team" && (
-          <div className="space-y-4 p-4 rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5">
-            <h3 className="text-fuchsia-400 font-semibold">Team Settings</h3>
-
-            {/* Grouping mode toggle */}
-            <div className="flex gap-2">
-              <button
-                onClick={() =>
-                  onTeamConfigChange({ ...teamConfig, groupingMode: "byTeamCount" })
-                }
-                className={`flex-1 py-2 px-3 rounded text-sm transition-all ${
-                  teamConfig.groupingMode === "byTeamCount"
-                    ? "bg-fuchsia-500/30 text-fuchsia-300 border border-fuchsia-400"
-                    : "bg-slate-800/50 text-slate-400 border border-slate-600"
-                }`}
-              >
-                # of Teams
-              </button>
-              <button
-                onClick={() =>
-                  onTeamConfigChange({ ...teamConfig, groupingMode: "byPlayerCount" })
-                }
-                className={`flex-1 py-2 px-3 rounded text-sm transition-all ${
-                  teamConfig.groupingMode === "byPlayerCount"
-                    ? "bg-fuchsia-500/30 text-fuchsia-300 border border-fuchsia-400"
-                    : "bg-slate-800/50 text-slate-400 border border-slate-600"
-                }`}
-              >
-                Players/Team
-              </button>
-            </div>
-
-            {/* Number input */}
-            <div className="flex items-center justify-center gap-4">
-              <button
-                onClick={() => {
-                  if (teamConfig.groupingMode === "byTeamCount") {
-                    onTeamConfigChange({
-                      ...teamConfig,
-                      teamCount: Math.max(2, teamConfig.teamCount - 1),
-                    })
-                  } else {
-                    onTeamConfigChange({
-                      ...teamConfig,
-                      playersPerTeam: Math.max(2, teamConfig.playersPerTeam - 1),
-                    })
-                  }
-                }}
-                className="w-10 h-10 rounded-full border border-cyan-400 text-cyan-400 text-xl hover:bg-cyan-400/20 transition-colors"
-              >
-                -
-              </button>
-              <div className="text-3xl font-bold text-cyan-400 w-16 text-center">
-                {teamConfig.groupingMode === "byTeamCount"
-                  ? teamConfig.teamCount
-                  : teamConfig.playersPerTeam}
-              </div>
-              <button
-                onClick={() => {
-                  if (teamConfig.groupingMode === "byTeamCount") {
-                    onTeamConfigChange({
-                      ...teamConfig,
-                      teamCount: Math.min(10, teamConfig.teamCount + 1),
-                    })
-                  } else {
-                    onTeamConfigChange({
-                      ...teamConfig,
-                      playersPerTeam: Math.min(10, teamConfig.playersPerTeam + 1),
-                    })
-                  }
-                }}
-                className="w-10 h-10 rounded-full border border-cyan-400 text-cyan-400 text-xl hover:bg-cyan-400/20 transition-colors"
-              >
-                +
-              </button>
-            </div>
-
-            <p className="text-slate-400 text-xs text-center">
-              {teamConfig.groupingMode === "byTeamCount"
-                ? `Divide players into ${teamConfig.teamCount} teams`
-                : `Create teams of ${teamConfig.playersPerTeam} players each`}
-            </p>
-          </div>
-        )}
-
-        {/* Start Button */}
-        <div className="flex justify-center pt-4">
-          <NeonButton onClick={onStart} color="cyan" size="lg">
+        {/* Bottom section - Fullscreen button and Start Button */}
+        <div className="flex gap-3 items-stretch">
+          <button
+            onClick={toggleFullscreen}
+            className="px-4 flex items-center justify-center rounded-lg border-2 border-slate-600 bg-black/30 text-slate-400 hover:border-slate-500 hover:text-slate-300 transition-colors"
+            aria-label="Toggle fullscreen"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+              <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+              <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+              <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+            </svg>
+          </button>
+          <NeonButton
+            onClick={onStart}
+            color="cyan"
+            size="lg"
+            className="flex-1 py-4 text-xl"
+          >
             Start
           </NeonButton>
-        </div>
-
-        {/* Instructions */}
-        <div className="text-center text-slate-500 text-sm space-y-1">
-          <p>Each player places a finger on the screen</p>
-          <p>Keep fingers still for the countdown</p>
         </div>
       </div>
     </div>
@@ -189,15 +214,17 @@ function ModeButton({ active, onClick, label, description }: ModeButtonProps) {
     <button
       onClick={onClick}
       className={`
-        p-3 rounded-lg text-center transition-all duration-300
+        p-3 rounded-lg text-center transition-all duration-300 border-2
         ${
           active
-            ? "bg-cyan-500/20 border-2 border-cyan-400 shadow-lg shadow-cyan-500/20"
-            : "bg-slate-800/50 border border-slate-600 hover:border-slate-500"
+            ? "bg-cyan-500/20 border-cyan-400 shadow-lg shadow-cyan-500/20"
+            : "bg-black/30 border-slate-700 hover:border-slate-600"
         }
       `}
     >
-      <div className={`font-semibold ${active ? "text-cyan-400" : "text-slate-300"}`}>
+      <div
+        className={`font-semibold ${active ? "text-cyan-400" : "text-slate-300"}`}
+      >
         {label}
       </div>
       <div className="text-xs text-slate-500 mt-1">{description}</div>

@@ -8,10 +8,13 @@ export function Countdown({ count, isVisible }: CountdownProps) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+      {/* Subtle pulsing glow background */}
+      <div className="absolute inset-0 countdown-glow-bg" />
+
       <div className="relative">
         {/* Semi-transparent backdrop behind countdown only */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-40 h-40 rounded-full bg-slate-900/80 backdrop-blur-sm" />
+          <div className="w-40 h-40 rounded-full bg-black/80 backdrop-blur-sm" />
         </div>
 
         <svg
@@ -86,18 +89,6 @@ export function Countdown({ count, isVisible }: CountdownProps) {
             {count}
           </text>
         </svg>
-
-        {/* Pulsing rings */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="absolute w-32 h-32 rounded-full border-2 border-cyan-400 opacity-50 animate-ping"
-            style={{ animationDuration: "1s" }}
-          />
-          <div
-            className="absolute w-40 h-40 rounded-full border border-fuchsia-500 opacity-30 animate-ping"
-            style={{ animationDuration: "1.5s" }}
-          />
-        </div>
       </div>
     </div>
   )

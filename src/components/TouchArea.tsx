@@ -178,11 +178,11 @@ export function TouchArea({
     >
       {/* Background grid effect */}
       <div
-        className="absolute inset-0 opacity-10"
+        className="absolute inset-0 opacity-5"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(0, 240, 255, 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 240, 255, 0.3) 1px, transparent 1px)
+            linear-gradient(rgba(0, 240, 255, 0.5) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 240, 255, 0.5) 1px, transparent 1px)
           `,
           backgroundSize: "50px 50px",
         }}

@@ -14,6 +14,7 @@ body {
   position: fixed;
   width: 100%;
   height: 100%;
+  background-color: #050508;
 }
 
 #root {
@@ -142,4 +143,27 @@ body {
     rgba(0, 240, 255, 0.1) 0%,
     transparent 70%
   );
+}
+
+/* Countdown subtle pulsing glow background */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.05);
+  }
+}
+
+.countdown-glow-bg {
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 240, 255, 0.15) 0%,
+    rgba(191, 0, 255, 0.1) 30%,
+    rgba(255, 0, 170, 0.05) 50%,
+    transparent 70%
+  );
+  animation: glow-pulse 1.5s ease-in-out infinite;
 }
