@@ -1,1 +1,145 @@
 @import "tailwindcss";
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+html,
+body {
+  overscroll-behavior: none;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* Neon text glow utility */
+.neon-text-cyan {
+  color: #00f0ff;
+  text-shadow:
+    0 0 7px #00f0ff,
+    0 0 10px #00f0ff,
+    0 0 21px #00f0ff,
+    0 0 42px #00f0ff;
+}
+
+.neon-text-pink {
+  color: #ff00aa;
+  text-shadow:
+    0 0 7px #ff00aa,
+    0 0 10px #ff00aa,
+    0 0 21px #ff00aa,
+    0 0 42px #ff00aa;
+}
+
+/* Scanline effect */
+.scanlines::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
+
+/* Pulse animation for selected player */
+@keyframes neon-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 40px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px currentColor) drop-shadow(0 0 60px currentColor)
+      drop-shadow(0 0 80px currentColor);
+  }
+}
+
+.neon-pulse {
+  animation: neon-pulse 1s ease-in-out infinite;
+}
+
+/* Flicker animation for sci-fi effect */
+@keyframes flicker {
+  0%,
+  19.999%,
+  22%,
+  62.999%,
+  64%,
+  64.999%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  21.999%,
+  63%,
+  63.999%,
+    64.5%,
+    69.999% {
+    opacity: 0.8;
+  }
+}
+
+.flicker {
+  animation: flicker 3s linear infinite;
+}
+
+/* Glow border utility */
+.glow-border-cyan {
+  border: 2px solid #00f0ff;
+  box-shadow:
+    0 0 5px #00f0ff,
+    0 0 10px #00f0ff,
+    inset 0 0 5px rgba(0, 240, 255, 0.2);
+}
+
+.glow-border-pink {
+  border: 2px solid #ff00aa;
+  box-shadow:
+    0 0 5px #ff00aa,
+    0 0 10px #ff00aa,
+    inset 0 0 5px rgba(255, 0, 170, 0.2);
+}
+
+/* Smooth transitions */
+.transition-neon {
+  transition:
+    box-shadow 0.3s ease,
+    text-shadow 0.3s ease,
+    filter 0.3s ease;
+}
+
+/* Grid background pattern */
+.grid-bg {
+  background-image: linear-gradient(
+      rgba(0, 240, 255, 0.03) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Radial glow background */
+.radial-glow {
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 240, 255, 0.1) 0%,
+    transparent 70%
+  );
+}
