@@ -17,6 +17,17 @@ function toggleFullscreen() {
   }
 }
 
+function isRunningAsPWA(): boolean {
+  // iOS Safari "Add to Home Screen"
+  if ((navigator as unknown as { standalone?: boolean }).standalone) return true
+
+  // Other browsers (Chrome, Edge, etc.) in standalone or fullscreen mode
+  if (window.matchMedia("(display-mode: standalone)").matches) return true
+  if (window.matchMedia("(display-mode: fullscreen)").matches) return true
+
+  return false
+}
+
 export function ModeSelector({
   mode,
   onModeChange,
@@ -167,27 +178,29 @@ export function ModeSelector({
 
         {/* Bottom section - Fullscreen button and Start Button */}
         <div className="flex gap-3 items-stretch">
-          <button
-            onClick={toggleFullscreen}
-            className="px-4 flex items-center justify-center rounded-lg border-2 border-slate-600 bg-black/30 text-slate-400 hover:border-slate-500 hover:text-slate-300 transition-colors"
-            aria-label="Toggle fullscreen"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {!isRunningAsPWA() && (
+            <button
+              onClick={toggleFullscreen}
+              className="px-4 flex items-center justify-center rounded-lg border-2 border-slate-600 bg-black/30 text-slate-400 hover:border-slate-500 hover:text-slate-300 transition-colors"
+              aria-label="Toggle fullscreen"
             >
-              <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-              <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
-              <path d="M3 16v3a2 2 0 0 0 2 2h3" />
-              <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
-            </svg>
-          </button>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+                <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+                <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+              </svg>
+            </button>
+          )}
           <NeonButton
             onClick={onStart}
             color="cyan"
