@@ -15,9 +15,10 @@ export default defineConfig({
         name: "Player Picker",
         short_name: "Picker",
         description: "Choose who goes first in your game",
-        theme_color: "#0f172a",
-        background_color: "#0f172a",
+        theme_color: "#050508",
+        background_color: "#050508",
         display: "standalone",
+        display_override: ["standalone", "fullscreen"],
         orientation: "portrait",
         icons: [
           {
