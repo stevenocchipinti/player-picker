@@ -96,34 +96,39 @@ export function ModeSelector({
           </div>
         </div>
 
-        {/* Middle section - Numeric selector (fills remaining space, content at top) */}
-        <div className="flex-1 pt-6">
+        {/* Spacer to push content down */}
+        <div className="flex-1" />
+
+        {/* Bottom section - Numeric selector and Start Button */}
+        <div>
+          {/* Numeric selector - slides up from behind start button */}
           <div
             className={`
+              flex justify-center relative z-0
               transition-all duration-300 ease-in-out
               ${isTeamMode 
-                ? "opacity-100" 
-                : "opacity-0 h-0 overflow-hidden"}
+                ? "opacity-100 max-h-20 mb-0" 
+                : "opacity-0 max-h-0 overflow-hidden"}
             `}
           >
             <div
               style={{
                 background: "#6b21a8",
-                clipPath: "polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px)",
+                clipPath: "polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px)",
                 padding: '1px',
               }}
             >
               <div
-                className="flex items-center justify-center gap-4 p-4"
+                className="flex items-center justify-center gap-3 p-3"
                 style={{
                   background: "#0a0a0f",
-                  clipPath: "polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px)",
+                  clipPath: "polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px)",
                 }}
               >
                 <div
                   style={{
                     background: "#a855f7",
-                    clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                    clipPath: "polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px)",
                     padding: '1px',
                   }}
                 >
@@ -141,16 +146,16 @@ export function ModeSelector({
                         })
                       }
                     }}
-                    className="w-10 h-10 text-purple-400 text-xl hover:bg-purple-500/20 transition-colors flex items-center justify-center"
+                    className="w-8 h-8 text-purple-400 text-lg hover:bg-purple-500/20 transition-colors flex items-center justify-center"
                     style={{
                       background: "#0a0a0f",
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                      clipPath: "polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px)",
                     }}
                   >
                     -
                   </button>
                 </div>
-                <div className="text-3xl font-bold text-purple-400 w-16 text-center">
+                <div className="text-2xl font-bold text-purple-400 w-10 text-center">
                   {showTeamCountControl
                     ? teamConfig.teamCount
                     : teamConfig.playersPerTeam}
@@ -158,7 +163,7 @@ export function ModeSelector({
                 <div
                   style={{
                     background: "#a855f7",
-                    clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                    clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
                     padding: '1px',
                   }}
                 >
@@ -176,10 +181,10 @@ export function ModeSelector({
                         })
                       }
                     }}
-                    className="w-10 h-10 text-purple-400 text-xl hover:bg-purple-500/20 transition-colors flex items-center justify-center"
+                    className="w-8 h-8 text-purple-400 text-lg hover:bg-purple-500/20 transition-colors flex items-center justify-center"
                     style={{
                       background: "#0a0a0f",
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                      clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
                     }}
                   >
                     +
@@ -188,18 +193,18 @@ export function ModeSelector({
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Bottom section - Start Button */}
-        <div>
-          <NeonButton
-            onClick={onStart}
-            color="cyan"
-            size="lg"
-            className="w-full py-4 text-xl"
-          >
-            Start
-          </NeonButton>
+          {/* Start Button */}
+          <div className="relative z-10 -mt-4">
+            <NeonButton
+              onClick={onStart}
+              color="cyan"
+              size="lg"
+              className="w-full py-4 text-xl"
+            >
+              Start
+            </NeonButton>
+          </div>
         </div>
       </div>
     </div>

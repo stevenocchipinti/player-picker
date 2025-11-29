@@ -59,46 +59,52 @@ export function NeonButton({
     <div
       className={`relative ${className}`}
       style={{
-        background: colors.border,
         clipPath: "polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px)",
-        padding: '2px',
       }}
     >
-      <button
-        onClick={onClick}
-        disabled={disabled}
-        className={`
-          relative w-full font-bold uppercase tracking-widest
-          backdrop-blur-sm overflow-hidden
-          transition-all duration-300 ease-out
-          ${sizeStyles[size]}
-          ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-[1.01] active:scale-[0.99]"}
-        `}
+      <div
         style={{
-          color: colors.text,
-          backgroundColor: colors.bgSolid,
-          boxShadow: colors.shadow,
-          clipPath: "polygon(23px 0, 100% 0, 100% calc(100% - 23px), calc(100% - 23px) 100%, 0 100%, 0 23px)",
-        }}
-        onMouseEnter={(e) => {
-          if (!disabled) {
-            e.currentTarget.style.boxShadow = colors.hoverShadow
-          }
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = colors.shadow
+          background: colors.border,
+          clipPath: "polygon(24px 0, 100% 0, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%, 0 24px)",
+          padding: '2px',
         }}
       >
-        {/* Scan line effect */}
-        <div 
-          className="absolute inset-0 opacity-[0.07] pointer-events-none"
+        <button
+          onClick={onClick}
+          disabled={disabled}
+          className={`
+            relative w-full font-bold uppercase tracking-widest
+            overflow-hidden
+            transition-all duration-300 ease-out
+            ${sizeStyles[size]}
+            ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer hover:scale-[1.01] active:scale-[0.99]"}
+          `}
           style={{
-            background: "repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 4px)",
+            color: colors.text,
+            backgroundColor: colors.bgSolid,
+            boxShadow: colors.shadow,
+            clipPath: "polygon(23px 0, 100% 0, 100% calc(100% - 23px), calc(100% - 23px) 100%, 0 100%, 0 23px)",
           }}
-        />
-        
-        <span className="relative">{children}</span>
-      </button>
+          onMouseEnter={(e) => {
+            if (!disabled) {
+              e.currentTarget.style.boxShadow = colors.hoverShadow
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = colors.shadow
+          }}
+        >
+          {/* Scan line effect */}
+          <div 
+            className="absolute inset-0 opacity-[0.07] pointer-events-none"
+            style={{
+              background: "repeating-linear-gradient(0deg, transparent, transparent 2px, currentColor 2px, currentColor 4px)",
+            }}
+          />
+          
+          <span className="relative">{children}</span>
+        </button>
+      </div>
     </div>
   )
 }
