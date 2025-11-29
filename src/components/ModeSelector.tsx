@@ -100,54 +100,93 @@ export function ModeSelector({
         <div className="flex-1 pt-6">
           <div
             className={`
-              flex items-center justify-center gap-4 rounded-lg border bg-purple-950/30
               transition-all duration-300 ease-in-out
               ${isTeamMode 
-                ? "opacity-100 p-3 border-purple-500/30" 
-                : "opacity-0 h-0 p-0 border-transparent overflow-hidden"}
+                ? "opacity-100" 
+                : "opacity-0 h-0 overflow-hidden"}
             `}
           >
-            <button
-              onClick={() => {
-                if (showTeamCountControl) {
-                  onTeamConfigChange({
-                    ...teamConfig,
-                    teamCount: Math.max(2, teamConfig.teamCount - 1),
-                  })
-                } else {
-                  onTeamConfigChange({
-                    ...teamConfig,
-                    playersPerTeam: Math.max(2, teamConfig.playersPerTeam - 1),
-                  })
-                }
+            <div
+              style={{
+                background: "#6b21a8",
+                clipPath: "polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px)",
+                padding: '1px',
               }}
-              className="w-10 h-10 rounded-full border border-purple-400 text-purple-400 text-xl hover:bg-purple-400/20 transition-colors"
             >
-              -
-            </button>
-            <div className="text-3xl font-bold text-purple-400 w-16 text-center">
-              {showTeamCountControl
-                ? teamConfig.teamCount
-                : teamConfig.playersPerTeam}
+              <div
+                className="flex items-center justify-center gap-4 p-4"
+                style={{
+                  background: "#0a0a0f",
+                  clipPath: "polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px)",
+                }}
+              >
+                <div
+                  style={{
+                    background: "#a855f7",
+                    clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                    padding: '1px',
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      if (showTeamCountControl) {
+                        onTeamConfigChange({
+                          ...teamConfig,
+                          teamCount: Math.max(2, teamConfig.teamCount - 1),
+                        })
+                      } else {
+                        onTeamConfigChange({
+                          ...teamConfig,
+                          playersPerTeam: Math.max(2, teamConfig.playersPerTeam - 1),
+                        })
+                      }
+                    }}
+                    className="w-10 h-10 text-purple-400 text-xl hover:bg-purple-500/20 transition-colors flex items-center justify-center"
+                    style={{
+                      background: "#0a0a0f",
+                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                    }}
+                  >
+                    -
+                  </button>
+                </div>
+                <div className="text-3xl font-bold text-purple-400 w-16 text-center">
+                  {showTeamCountControl
+                    ? teamConfig.teamCount
+                    : teamConfig.playersPerTeam}
+                </div>
+                <div
+                  style={{
+                    background: "#a855f7",
+                    clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                    padding: '1px',
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      if (showTeamCountControl) {
+                        onTeamConfigChange({
+                          ...teamConfig,
+                          teamCount: Math.min(10, teamConfig.teamCount + 1),
+                        })
+                      } else {
+                        onTeamConfigChange({
+                          ...teamConfig,
+                          playersPerTeam: Math.min(10, teamConfig.playersPerTeam + 1),
+                        })
+                      }
+                    }}
+                    className="w-10 h-10 text-purple-400 text-xl hover:bg-purple-500/20 transition-colors flex items-center justify-center"
+                    style={{
+                      background: "#0a0a0f",
+                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
+                    }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
             </div>
-            <button
-              onClick={() => {
-                if (showTeamCountControl) {
-                  onTeamConfigChange({
-                    ...teamConfig,
-                    teamCount: Math.min(10, teamConfig.teamCount + 1),
-                  })
-                } else {
-                  onTeamConfigChange({
-                    ...teamConfig,
-                    playersPerTeam: Math.min(10, teamConfig.playersPerTeam + 1),
-                  })
-                }
-              }}
-              className="w-10 h-10 rounded-full border border-purple-400 text-purple-400 text-xl hover:bg-purple-400/20 transition-colors"
-            >
-              +
-            </button>
           </div>
         </div>
 
@@ -175,24 +214,52 @@ interface ModeButtonProps {
 }
 
 function ModeButton({ active, onClick, label, description }: ModeButtonProps) {
+  const borderColor = active ? "#00f0ff" : "#475569"
+  
   return (
-    <button
-      onClick={onClick}
-      className={`
-        p-3 rounded-lg text-center transition-all duration-300 border-2
-        ${
-          active
-            ? "bg-cyan-500/20 border-cyan-400 shadow-lg shadow-cyan-500/20"
-            : "bg-black/30 border-slate-700 hover:border-slate-600"
-        }
-      `}
+    <div
+      className="relative"
+      style={{
+        background: borderColor,
+        clipPath: "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
+        padding: '1px',
+      }}
     >
-      <div
-        className={`font-semibold ${active ? "text-cyan-400" : "text-slate-300"}`}
+      <button
+        onClick={onClick}
+        className={`
+          relative w-full p-4 text-center transition-all duration-300
+          backdrop-blur-sm
+          ${
+            active
+              ? "bg-cyan-950/90"
+              : "bg-[#0a0a0f] hover:bg-[#0f0f18]"
+          }
+        `}
+        style={{
+          clipPath: "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
+          boxShadow: active
+            ? "0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 30px rgba(0, 240, 255, 0.1)"
+            : "none",
+        }}
       >
-        {label}
-      </div>
-      <div className="text-xs text-slate-500 mt-1">{description}</div>
-    </button>
+        {/* Scan line effect */}
+        {active && (
+          <div 
+            className="absolute inset-0 opacity-10 pointer-events-none"
+            style={{
+              background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.3) 2px, rgba(0, 240, 255, 0.3) 4px)",
+            }}
+          />
+        )}
+        
+        <div
+          className={`relative font-bold tracking-wide uppercase text-sm ${active ? "text-cyan-400" : "text-slate-300"}`}
+        >
+          {label}
+        </div>
+        <div className={`relative text-xs mt-1 ${active ? "text-cyan-500/70" : "text-slate-500"}`}>{description}</div>
+      </button>
+    </div>
   )
 }
