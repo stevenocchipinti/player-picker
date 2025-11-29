@@ -17,8 +17,8 @@ export default defineConfig({
         description: "Choose who goes first in your game",
         theme_color: "#050508",
         background_color: "#050508",
-        display: "standalone",
-        display_override: ["standalone", "fullscreen"],
+        display: "fullscreen",
+        display_override: ["fullscreen", "standalone", "browser"],
         orientation: "portrait",
         icons: [
           {
