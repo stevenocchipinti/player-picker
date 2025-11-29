@@ -76,23 +76,15 @@ export function ModeSelector({
             </h1>
           </div>
 
-          {/* Mode Selection - 2x2 Grid */}
+          {/* Mode Selection - Single Column */}
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              {/* Top row */}
+            <div className="flex flex-col gap-3">
               <ModeButton
                 active={mode === "standard"}
                 onClick={() => onModeChange("standard")}
                 label="Standard"
                 description="Pick one player"
               />
-              <ModeButton
-                active={mode === "single"}
-                onClick={() => onModeChange("single")}
-                label="Solo"
-                description="Practice mode"
-              />
-              {/* Bottom row - Team options */}
               <ModeButton
                 active={showTeamCountControl}
                 onClick={() => {
@@ -128,8 +120,8 @@ export function ModeSelector({
               flex items-center justify-center gap-4 rounded-lg border bg-purple-950/30
               transition-all duration-300 ease-in-out
               ${isTeamMode 
-                ? "opacity-100 h-14 py-2 px-4 border-purple-500/30" 
-                : "opacity-0 h-0 py-0 px-4 border-transparent overflow-hidden"}
+                ? "opacity-100 p-3 border-purple-500/30" 
+                : "opacity-0 h-0 p-0 border-transparent overflow-hidden"}
             `}
           >
             <button

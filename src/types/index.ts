@@ -7,7 +7,7 @@ export interface TouchPoint {
   team?: number
 }
 
-export type GameMode = "standard" | "single" | "team"
+export type GameMode = "standard" | "team"
 
 export type GamePhase = "waiting" | "ready" | "countdown" | "selecting" | "result"
 

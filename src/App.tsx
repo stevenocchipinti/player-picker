@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import type { TouchPoint, GameMode, GamePhase, TeamConfig } from "./types"
-import { getPlayerColor, NEON_COLORS } from "./types"
+import { NEON_COLORS } from "./types"
 import { TouchArea } from "./components/TouchArea"
 import { Countdown } from "./components/Countdown"
 import { ModeSelector } from "./components/ModeSelector"
 
 const COUNTDOWN_START = 3
-const MIN_PLAYERS_STANDARD = 2
-const MIN_PLAYERS_SINGLE = 1
+const MIN_PLAYERS = 2
 
 function App() {
   const [phase, setPhase] = useState<GamePhase>("waiting")
@@ -25,9 +24,8 @@ function App() {
 
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const previousTouchCountRef = useRef(0)
-  const simulatedTouchesRef = useRef<TouchPoint[]>([])
 
-  const minPlayers = mode === "single" ? MIN_PLAYERS_SINGLE : MIN_PLAYERS_STANDARD
+  const minPlayers = MIN_PLAYERS
 
   // Clear countdown timer
   const clearCountdown = useCallback(() => {
@@ -46,15 +44,11 @@ function App() {
     setCountdown(COUNTDOWN_START)
     setTouchPoints([])
     previousTouchCountRef.current = 0
-    simulatedTouchesRef.current = []
   }, [clearCountdown])
 
   // Select a random player
   const selectRandomPlayer = useCallback(() => {
-    const allPoints =
-      mode === "single"
-        ? [...touchPoints, ...simulatedTouchesRef.current]
-        : touchPoints
+    const allPoints = touchPoints
 
     if (allPoints.length === 0) return
 
@@ -112,10 +106,6 @@ function App() {
 
       setTouchPoints(points)
 
-      // Calculate total players including simulated
-      const totalPlayers =
-        mode === "single" ? newCount + simulatedTouchesRef.current.length : newCount
-
       // If touch count changed, reset countdown
       if (prevCount !== newCount && phase === "countdown") {
         clearCountdown()
@@ -124,7 +114,7 @@ function App() {
       }
 
       // Check if we have enough players
-      if (totalPlayers >= minPlayers) {
+      if (newCount >= minPlayers) {
         if (phase === "waiting" || phase === "ready") {
           setPhase("ready")
           // Start countdown after a brief moment of stability
@@ -140,35 +130,14 @@ function App() {
         }
       }
     },
-    [phase, mode, minPlayers, clearCountdown, startCountdown]
+    [phase, minPlayers, clearCountdown, startCountdown]
   )
-
-  // Generate simulated touches for single player mode
-  const generateSimulatedTouches = useCallback(() => {
-    const simulated: TouchPoint[] = []
-    const numSimulated = 3 + Math.floor(Math.random() * 3) // 3-5 simulated players
-
-    for (let i = 0; i < numSimulated; i++) {
-      simulated.push({
-        id: -(i + 1), // Negative IDs for simulated
-        x: 100 + Math.random() * (window.innerWidth - 200),
-        y: 150 + Math.random() * (window.innerHeight - 300),
-        color: getPlayerColor(i + 1),
-      })
-    }
-
-    simulatedTouchesRef.current = simulated
-  }, [])
 
   // Handle starting the game from menu
   const handleStart = useCallback(() => {
     setShowMenu(false)
     resetGame()
-
-    if (mode === "single") {
-      generateSimulatedTouches()
-    }
-  }, [mode, resetGame, generateSimulatedTouches])
+  }, [resetGame])
 
   // Handle restart
   const handleRestart = useCallback(() => {
@@ -208,16 +177,10 @@ function App() {
     )
   }
 
-  // Combine real and simulated touches for display
-  const allTouchPoints =
-    mode === "single"
-      ? [...touchPoints, ...simulatedTouchesRef.current]
-      : touchPoints
-
   return (
     <main className="min-h-screen bg-[#050508] overflow-hidden relative">
       <TouchArea
-        touchPoints={allTouchPoints}
+        touchPoints={touchPoints}
         onTouchChange={handleTouchChange}
         selectedId={selectedId}
         showTeams={mode === "team" && phase === "result"}
