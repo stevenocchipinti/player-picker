@@ -133,6 +133,16 @@ function App() {
     [phase, minPlayers, clearCountdown, startCountdown]
   )
 
+  // Check if running as installed PWA (already in fullscreen/standalone mode)
+  const isStandalonePWA = useCallback(() => {
+    return (
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as Navigator & { standalone?: boolean }).standalone ===
+        true
+    )
+  }, [])
+
   // Handle starting the game from menu
   const handleStart = useCallback(() => {
     setShowMenu(false)
@@ -141,13 +151,13 @@ function App() {
     document.documentElement.classList.add("game-active")
     // Push a history state so browser back button can return to menu
     window.history.pushState({ screen: "game" }, "")
-    // Enter fullscreen if not already
-    if (!document.fullscreenElement) {
+    // Enter fullscreen only if not already in PWA mode
+    if (!isStandalonePWA() && !document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {
         // Fullscreen request may fail (e.g., not triggered by user gesture)
       })
     }
-  }, [resetGame])
+  }, [resetGame, isStandalonePWA])
 
   // Handle restart
   const handleRestart = useCallback(() => {
@@ -155,13 +165,13 @@ function App() {
     setShowMenu(true)
     // Unlock scrolling for menu
     document.documentElement.classList.remove("game-active")
-    // Exit fullscreen if active
-    if (document.fullscreenElement) {
+    // Exit fullscreen only if not in PWA mode (we entered it ourselves)
+    if (!isStandalonePWA() && document.fullscreenElement) {
       document.exitFullscreen().catch(() => {
         // Exit fullscreen may fail
       })
     }
-  }, [resetGame])
+  }, [resetGame, isStandalonePWA])
 
   // Handle browser back button
   useEffect(() => {
@@ -171,8 +181,8 @@ function App() {
         setShowMenu(true)
         // Unlock scrolling for menu
         document.documentElement.classList.remove("game-active")
-        // Exit fullscreen if active
-        if (document.fullscreenElement) {
+        // Exit fullscreen only if not in PWA mode
+        if (!isStandalonePWA() && document.fullscreenElement) {
           document.exitFullscreen().catch(() => {})
         }
       }
@@ -180,7 +190,7 @@ function App() {
 
     window.addEventListener("popstate", handlePopState)
     return () => window.removeEventListener("popstate", handlePopState)
-  }, [showMenu, resetGame])
+  }, [showMenu, resetGame, isStandalonePWA])
 
   // Cleanup on unmount
   useEffect(() => {
