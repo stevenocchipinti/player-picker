@@ -23,9 +23,9 @@ export function ModeSelector({
     isTeamMode && teamConfig.groupingMode === "byPlayerCount"
 
   return (
-    <div className="fixed inset-0 flex flex-col z-50 p-6">
+    <div className="min-h-screen flex flex-col z-50 p-6">
       {/* Mesh gradient background */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute inset-0 opacity-40"
           style={{
@@ -40,7 +40,7 @@ export function ModeSelector({
         />
       </div>
 
-      <div className="relative z-10 flex flex-col flex-1 max-w-md w-full mx-auto">
+      <div className="relative z-10 flex gap-4 flex-col flex-1 max-w-md w-full mx-auto">
         {/* Top section - Title and Mode Selection (anchored to top) */}
         <div className="space-y-8 pt-8">
           {/* Title */}
@@ -52,7 +52,8 @@ export function ModeSelector({
                   "linear-gradient(135deg, #00f0ff 0%, #bf00ff 50%, #ff00aa 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                filter: "drop-shadow(0 0 30px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 60px rgba(191, 0, 255, 0.5))",
+                filter:
+                  "drop-shadow(0 0 30px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 60px rgba(191, 0, 255, 0.5))",
               }}
             >
               Player Picker
@@ -106,30 +107,35 @@ export function ModeSelector({
             className={`
               flex justify-center relative z-0
               transition-all duration-300 ease-in-out
-              ${isTeamMode 
-                ? "opacity-100 max-h-20 mb-0" 
-                : "opacity-0 max-h-0 overflow-hidden"}
+              ${
+                isTeamMode
+                  ? "opacity-100 max-h-20 mb-0"
+                  : "opacity-0 max-h-0 overflow-hidden"
+              }
             `}
           >
             <div
               style={{
                 background: "#6b21a8",
-                clipPath: "polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px)",
-                padding: '1px',
+                clipPath:
+                  "polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px)",
+                padding: "1px",
               }}
             >
               <div
                 className="flex items-center justify-center gap-3 p-3"
                 style={{
                   background: "#0a0a0f",
-                  clipPath: "polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px)",
+                  clipPath:
+                    "polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px)",
                 }}
               >
                 <div
                   style={{
                     background: "#a855f7",
-                    clipPath: "polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px)",
-                    padding: '1px',
+                    clipPath:
+                      "polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px)",
+                    padding: "1px",
                   }}
                 >
                   <button
@@ -142,14 +148,18 @@ export function ModeSelector({
                       } else {
                         onTeamConfigChange({
                           ...teamConfig,
-                          playersPerTeam: Math.max(2, teamConfig.playersPerTeam - 1),
+                          playersPerTeam: Math.max(
+                            2,
+                            teamConfig.playersPerTeam - 1
+                          ),
                         })
                       }
                     }}
                     className="w-8 h-8 text-purple-400 text-lg hover:bg-purple-500/20 transition-colors flex items-center justify-center"
                     style={{
                       background: "#0a0a0f",
-                      clipPath: "polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px)",
+                      clipPath:
+                        "polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px)",
                     }}
                   >
                     -
@@ -163,8 +173,9 @@ export function ModeSelector({
                 <div
                   style={{
                     background: "#a855f7",
-                    clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
-                    padding: '1px',
+                    clipPath:
+                      "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
+                    padding: "1px",
                   }}
                 >
                   <button
@@ -177,14 +188,18 @@ export function ModeSelector({
                       } else {
                         onTeamConfigChange({
                           ...teamConfig,
-                          playersPerTeam: Math.min(10, teamConfig.playersPerTeam + 1),
+                          playersPerTeam: Math.min(
+                            10,
+                            teamConfig.playersPerTeam + 1
+                          ),
                         })
                       }
                     }}
                     className="w-8 h-8 text-purple-400 text-lg hover:bg-purple-500/20 transition-colors flex items-center justify-center"
                     style={{
                       background: "#0a0a0f",
-                      clipPath: "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
+                      clipPath:
+                        "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
                     }}
                   >
                     +
@@ -220,29 +235,36 @@ interface ModeButtonProps {
 
 function ModeButton({ active, onClick, label, description }: ModeButtonProps) {
   const borderColor = active ? "#00f0ff" : "#475569"
-  
+
+  const handleClick = () => {
+    onClick()
+    // Scroll to bottom after mode selection to make start button accessible
+    // Wait for the numeric selector panel animation to complete (duration-300 = 300ms)
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
+    }, 300)
+  }
+
   return (
     <div
       className="relative"
       style={{
         background: borderColor,
-        clipPath: "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
-        padding: '1px',
+        clipPath:
+          "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
+        padding: "1px",
       }}
     >
       <button
-        onClick={onClick}
+        onClick={handleClick}
         className={`
           relative w-full p-4 text-center transition-all duration-300
           backdrop-blur-sm
-          ${
-            active
-              ? "bg-cyan-950/90"
-              : "bg-[#0a0a0f] hover:bg-[#0f0f18]"
-          }
+          ${active ? "bg-cyan-950/90" : "bg-[#0a0a0f] hover:bg-[#0f0f18]"}
         `}
         style={{
-          clipPath: "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
+          clipPath:
+            "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
           boxShadow: active
             ? "0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 30px rgba(0, 240, 255, 0.1)"
             : "none",
@@ -250,20 +272,25 @@ function ModeButton({ active, onClick, label, description }: ModeButtonProps) {
       >
         {/* Scan line effect */}
         {active && (
-          <div 
+          <div
             className="absolute inset-0 opacity-10 pointer-events-none"
             style={{
-              background: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.3) 2px, rgba(0, 240, 255, 0.3) 4px)",
+              background:
+                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.3) 2px, rgba(0, 240, 255, 0.3) 4px)",
             }}
           />
         )}
-        
+
         <div
           className={`relative font-bold tracking-wide uppercase text-sm ${active ? "text-cyan-400" : "text-slate-300"}`}
         >
           {label}
         </div>
-        <div className={`relative text-xs mt-1 ${active ? "text-cyan-500/70" : "text-slate-500"}`}>{description}</div>
+        <div
+          className={`relative text-xs mt-1 ${active ? "text-cyan-500/70" : "text-slate-500"}`}
+        >
+          {description}
+        </div>
       </button>
     </div>
   )

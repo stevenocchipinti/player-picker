@@ -137,6 +137,8 @@ function App() {
   const handleStart = useCallback(() => {
     setShowMenu(false)
     resetGame()
+    // Lock scrolling for game screen
+    document.documentElement.classList.add("game-active")
     // Push a history state so browser back button can return to menu
     window.history.pushState({ screen: "game" }, "")
     // Enter fullscreen if not already
@@ -151,6 +153,8 @@ function App() {
   const handleRestart = useCallback(() => {
     resetGame()
     setShowMenu(true)
+    // Unlock scrolling for menu
+    document.documentElement.classList.remove("game-active")
     // Exit fullscreen if active
     if (document.fullscreenElement) {
       document.exitFullscreen().catch(() => {
@@ -165,6 +169,8 @@ function App() {
       if (!showMenu) {
         resetGame()
         setShowMenu(true)
+        // Unlock scrolling for menu
+        document.documentElement.classList.remove("game-active")
         // Exit fullscreen if active
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {})

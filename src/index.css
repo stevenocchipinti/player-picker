@@ -13,12 +13,17 @@
 
 html,
 body {
+  background-color: #050508;
+}
+
+/* Lock scrolling when game is active */
+html.game-active,
+html.game-active body {
   overscroll-behavior: none;
   overflow: hidden;
   position: fixed;
   width: 100%;
   height: 100%;
-  background-color: #050508;
 }
 
 #root {
