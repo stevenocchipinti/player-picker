@@ -137,13 +137,44 @@ function App() {
   const handleStart = useCallback(() => {
     setShowMenu(false)
     resetGame()
+    // Push a history state so browser back button can return to menu
+    window.history.pushState({ screen: "game" }, "")
+    // Enter fullscreen if not already
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {
+        // Fullscreen request may fail (e.g., not triggered by user gesture)
+      })
+    }
   }, [resetGame])
 
   // Handle restart
   const handleRestart = useCallback(() => {
     resetGame()
     setShowMenu(true)
+    // Exit fullscreen if active
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {
+        // Exit fullscreen may fail
+      })
+    }
   }, [resetGame])
+
+  // Handle browser back button
+  useEffect(() => {
+    const handlePopState = () => {
+      if (!showMenu) {
+        resetGame()
+        setShowMenu(true)
+        // Exit fullscreen if active
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {})
+        }
+      }
+    }
+
+    window.addEventListener("popstate", handlePopState)
+    return () => window.removeEventListener("popstate", handlePopState)
+  }, [showMenu, resetGame])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -179,6 +210,22 @@ function App() {
 
   return (
     <main className="min-h-screen bg-[#050508] overflow-hidden relative">
+      {/* Mesh gradient background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `
+              radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.4) 0%, transparent 50%),
+              radial-gradient(at 100% 0%, rgba(191, 0, 255, 0.3) 0%, transparent 50%),
+              radial-gradient(at 100% 100%, rgba(255, 0, 170, 0.4) 0%, transparent 50%),
+              radial-gradient(at 0% 100%, rgba(0, 150, 255, 0.3) 0%, transparent 50%),
+              radial-gradient(at 50% 50%, rgba(100, 0, 255, 0.2) 0%, transparent 60%)
+            `,
+          }}
+        />
+      </div>
+
       <TouchArea
         touchPoints={touchPoints}
         onTouchChange={handleTouchChange}
@@ -194,9 +241,22 @@ function App() {
       <div className="fixed bottom-4 left-4 z-40">
         <button
           onClick={handleRestart}
-          className="px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm border border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-600 text-sm transition-colors"
+          className="px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm border border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-600 text-sm transition-colors flex items-center gap-1.5"
         >
-          ← Menu
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5" />
+            <path d="M12 19l-7-7 7-7" />
+          </svg>
+          Menu
         </button>
       </div>
     </main>

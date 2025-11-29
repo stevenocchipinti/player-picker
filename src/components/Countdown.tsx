@@ -14,7 +14,7 @@ export function Countdown({ count, isVisible }: CountdownProps) {
       <div className="relative">
         {/* Semi-transparent backdrop behind countdown only */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-40 h-40 rounded-full bg-black/80 backdrop-blur-sm" />
+          <div className="w-40 h-40 rounded-full bg-black/50 backdrop-blur-sm" />
         </div>
 
         <svg

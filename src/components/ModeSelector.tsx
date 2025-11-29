@@ -9,25 +9,6 @@ interface ModeSelectorProps {
   onStart: () => void
 }
 
-function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen()
-  } else {
-    document.exitFullscreen()
-  }
-}
-
-function isRunningAsPWA(): boolean {
-  // iOS Safari "Add to Home Screen"
-  if ((navigator as unknown as { standalone?: boolean }).standalone) return true
-
-  // Other browsers (Chrome, Edge, etc.) in standalone or fullscreen mode
-  if (window.matchMedia("(display-mode: standalone)").matches) return true
-  if (window.matchMedia("(display-mode: fullscreen)").matches) return true
-
-  return false
-}
-
 export function ModeSelector({
   mode,
   onModeChange,
@@ -43,15 +24,17 @@ export function ModeSelector({
 
   return (
     <div className="fixed inset-0 flex flex-col z-50 p-6">
-      {/* Animated background */}
+      {/* Mesh gradient background */}
       <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute inset-0 opacity-15"
+          className="absolute inset-0 opacity-40"
           style={{
             backgroundImage: `
-              radial-gradient(circle at 20% 30%, rgba(0, 240, 255, 0.3) 0%, transparent 40%),
-              radial-gradient(circle at 80% 70%, rgba(255, 0, 170, 0.3) 0%, transparent 40%),
-              radial-gradient(circle at 50% 50%, rgba(191, 0, 255, 0.2) 0%, transparent 50%)
+              radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.4) 0%, transparent 50%),
+              radial-gradient(at 100% 0%, rgba(191, 0, 255, 0.3) 0%, transparent 50%),
+              radial-gradient(at 100% 100%, rgba(255, 0, 170, 0.4) 0%, transparent 50%),
+              radial-gradient(at 0% 100%, rgba(0, 150, 255, 0.3) 0%, transparent 50%),
+              radial-gradient(at 50% 50%, rgba(100, 0, 255, 0.2) 0%, transparent 60%)
             `,
           }}
         />
@@ -63,13 +46,13 @@ export function ModeSelector({
           {/* Title */}
           <div className="text-center">
             <h1
-              className="text-4xl md:text-5xl font-bold py-16"
+              className="text-6xl md:text-8xl font-bold py-6"
               style={{
                 background:
                   "linear-gradient(135deg, #00f0ff 0%, #bf00ff 50%, #ff00aa 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
-                filter: "drop-shadow(0 0 20px rgba(0, 240, 255, 0.5))",
+                filter: "drop-shadow(0 0 30px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 60px rgba(191, 0, 255, 0.5))",
               }}
             >
               Player Picker
@@ -168,36 +151,13 @@ export function ModeSelector({
           </div>
         </div>
 
-        {/* Bottom section - Fullscreen button and Start Button */}
-        <div className="flex gap-3 items-stretch">
-          {!isRunningAsPWA() && (
-            <button
-              onClick={toggleFullscreen}
-              className="px-4 flex items-center justify-center rounded-lg border-2 border-slate-600 bg-black/30 text-slate-400 hover:border-slate-500 hover:text-slate-300 transition-colors"
-              aria-label="Toggle fullscreen"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M8 3H5a2 2 0 0 0-2 2v3" />
-                <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
-                <path d="M3 16v3a2 2 0 0 0 2 2h3" />
-                <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
-              </svg>
-            </button>
-          )}
+        {/* Bottom section - Start Button */}
+        <div>
           <NeonButton
             onClick={onStart}
             color="cyan"
             size="lg"
-            className="flex-1 py-4 text-xl"
+            className="w-full py-4 text-xl"
           >
             Start
           </NeonButton>
