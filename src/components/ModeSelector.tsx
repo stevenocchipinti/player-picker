@@ -23,7 +23,7 @@ export function ModeSelector({
     isTeamMode && teamConfig.groupingMode === "byPlayerCount"
 
   return (
-    <div className="min-h-screen flex flex-col z-50 p-6">
+    <div className="h-dvh flex flex-col z-50 p-6 box-border">
       {/* Mesh gradient background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
@@ -42,7 +42,7 @@ export function ModeSelector({
 
       <div className="relative z-10 flex gap-4 flex-col flex-1 max-w-md w-full mx-auto">
         {/* Top section - Title and Mode Selection (anchored to top) */}
-        <div className="space-y-8 pt-8">
+        <div className="space-y-8">
           {/* Title */}
           <div className="text-center">
             <h1
@@ -236,15 +236,6 @@ interface ModeButtonProps {
 function ModeButton({ active, onClick, label, description }: ModeButtonProps) {
   const borderColor = active ? "#00f0ff" : "#475569"
 
-  const handleClick = () => {
-    onClick()
-    // Scroll to bottom after mode selection to make start button accessible
-    // Wait for the numeric selector panel animation to complete (duration-300 = 300ms)
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })
-    }, 300)
-  }
-
   return (
     <div
       className="relative"
@@ -256,7 +247,7 @@ function ModeButton({ active, onClick, label, description }: ModeButtonProps) {
       }}
     >
       <button
-        onClick={handleClick}
+        onClick={onClick}
         className={`
           relative w-full p-4 text-center transition-all duration-300
           backdrop-blur-sm
