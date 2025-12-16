@@ -212,7 +212,7 @@ function App() {
 
   if (showMenu) {
     return (
-      <main className="min-h-screen bg-[#050508] overflow-auto">
+      <main className="min-h-screen overflow-auto">
         <ModeSelector
           mode={mode}
           onModeChange={setMode}
@@ -225,7 +225,7 @@ function App() {
   }
 
   return (
-    <main className="fixed inset-0 bg-[#050508] overflow-hidden">
+    <main className="fixed inset-0 overflow-hidden">
       {/* Mesh gradient background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div

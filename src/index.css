@@ -11,12 +11,22 @@
   user-select: none;
 }
 
-html,
+html {
+  height: 100%;
+  width: 100%;
+  background-color: #050508;
+  overscroll-behavior: none;
+  padding: 0;
+  margin: 0;
+}
+
 body {
   height: 100%;
   width: 100%;
   background-color: #050508;
   overscroll-behavior: none;
+  padding: 0;
+  margin: 0;
 }
 
 /* Lock scrolling when game is active */
