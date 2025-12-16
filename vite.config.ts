@@ -10,7 +10,14 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "icon-192.png", "icon-512.png"],
+      includeAssets: [
+        "favicon.ico",
+        "favicon.svg",
+        "apple-touch-icon.png",
+        "icon-192.png",
+        "icon-512.png",
+        "icon-512-maskable.png",
+      ],
       manifest: {
         name: "Player Picker",
         short_name: "Picker",
@@ -21,41 +28,19 @@ export default defineConfig({
         display_override: ["fullscreen", "standalone", "browser"],
         orientation: "portrait",
         icons: [
+          { src: "/icon-192.png", type: "image/png", sizes: "192x192" },
+          { src: "/icon-512.png", type: "image/png", sizes: "512x512" },
           {
-            src: "icon-192.png",
-            sizes: "192x192",
+            src: "/icon-512-maskable.png",
             type: "image/png",
-          },
-          {
-            src: "icon-512.png",
             sizes: "512x512",
-            type: "image/png",
-          },
-          {
-            src: "icon-512.png",
-            sizes: "512x512",
-            type: "image/png",
             purpose: "maskable",
           },
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "google-fonts-cache",
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 * 365,
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
+        globPatterns: [
+          "**/*.{js,css,html,ico,png,svg,woff,woff2,ttf,otf}",
         ],
       },
     }),
