@@ -23,7 +23,7 @@ export function ModeSelector({
     isTeamMode && teamConfig.groupingMode === "byPlayerCount"
 
   return (
-    <div className="h-dvh flex flex-col z-50 p-6 box-border">
+    <div className="min-h-dvh flex flex-col z-50 p-6 box-border">
       {/* Mesh gradient background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div
