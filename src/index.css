@@ -1,7 +1,21 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Audiowide', sans-serif;
+  --font-sans: "Chakra Petch", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+:root {
+  --space: #050508;
+  --accent: #3ef0ff;
+  --accent-ink: #031418;
+  --text: #e8f7fb;
+  --text-dim: #9fb0b6;
+  --text-faint: #56707a;
+  --line: rgba(255, 255, 255, 0.08);
+  --panel: rgba(5, 8, 12, 0.6);
+  --safe-top: max(14px, env(safe-area-inset-top));
+  --safe-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
 * {
@@ -11,19 +25,12 @@
   user-select: none;
 }
 
-html {
-  height: 100%;
-  width: 100%;
-  background-color: #050508;
-  overscroll-behavior: none;
-  padding: 0;
-  margin: 0;
-}
-
+html,
 body {
   height: 100%;
   width: 100%;
-  background-color: #050508;
+  background-color: var(--space);
+  color: var(--text);
   overscroll-behavior: none;
   padding: 0;
   margin: 0;
@@ -41,148 +48,264 @@ html.game-active body {
   height: 100%;
 }
 
-/* Neon text glow utility */
-.neon-text-cyan {
-  color: #00f0ff;
-  text-shadow:
-    0 0 7px #00f0ff,
-    0 0 10px #00f0ff,
-    0 0 21px #00f0ff,
-    0 0 42px #00f0ff;
+button:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
 }
 
-.neon-text-pink {
-  color: #ff00aa;
-  text-shadow:
-    0 0 7px #ff00aa,
-    0 0 10px #ff00aa,
-    0 0 21px #ff00aa,
-    0 0 42px #ff00aa;
+/* Soft light falloff over the particle field */
+.space-vignette {
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(62, 240, 255, 0.06), transparent 60%),
+    radial-gradient(140% 90% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.45));
 }
 
-/* Scanline effect */
-.scanlines::after {
+/* Small uppercase mono labels used throughout the HUD */
+.hud-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.chamfer {
+  clip-path: polygon(
+    var(--cut, 10px) 0,
+    100% 0,
+    100% calc(100% - var(--cut, 10px)),
+    calc(100% - var(--cut, 10px)) 100%,
+    0 100%,
+    0 var(--cut, 10px)
+  );
+}
+
+/* ---- Menu ---------------------------------------------------------------- */
+
+.mode-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.mode-option:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.mode-option.is-active {
+  border-color: rgba(62, 240, 255, 0.4);
+  background: linear-gradient(90deg, rgba(62, 240, 255, 0.12), rgba(62, 240, 255, 0.02)), var(--panel);
+}
+
+.mode-option.is-active::before {
   content: "";
   position: absolute;
-  top: 0;
+  left: -1px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.mode-option__index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #3d4f56;
+}
+
+.mode-option__label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.mode-option__desc {
+  display: block;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.mode-option.is-active .mode-option__index,
+.mode-option.is-active .mode-option__label {
+  color: var(--accent);
+}
+
+.stepper-button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(62, 240, 255, 0.35);
+  color: var(--accent);
+  font-size: 18px;
+  transition: background-color 0.15s;
+}
+
+.stepper-button:hover:not(:disabled) {
+  background: rgba(62, 240, 255, 0.12);
+}
+
+.stepper-button:disabled {
+  opacity: 0.3;
+}
+
+.start-button {
+  --cut: 14px;
+  width: 100%;
+  padding: 18px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-indent: 0.35em;
+  text-transform: uppercase;
+  filter: drop-shadow(0 0 18px rgba(62, 240, 255, 0.45));
+  transition:
+    filter 0.2s,
+    transform 0.1s;
+}
+
+.start-button:hover {
+  filter: drop-shadow(0 0 26px rgba(62, 240, 255, 0.65));
+}
+
+.start-button:active {
+  transform: scale(0.99);
+}
+
+/* ---- Game HUD ------------------------------------------------------------ */
+
+.hud-safe {
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+.hud-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.hud-bar b {
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.hud-countdown {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--safe-top) + 28px);
+  transform: translateX(-50%);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.hud-countdown.is-visible {
+  opacity: 1;
+}
+
+.hud-countdown__number {
+  font-size: 64px;
+  font-weight: 300;
+  line-height: 1;
+  color: #eaffff;
+  text-shadow: 0 0 24px rgba(62, 240, 255, 0.7);
+}
+
+.hud-countdown__label {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: #5d7c86;
+}
+
+.hud-hint {
+  position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.15),
-    rgba(0, 0, 0, 0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  pointer-events: none;
+  top: 50%;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #4a626b;
+  opacity: 0;
+  transition: opacity 0.4s;
 }
 
-/* Pulse animation for selected player */
-@keyframes neon-pulse {
-  0%,
-  100% {
-    filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 40px currentColor);
-  }
-  50% {
-    filter: drop-shadow(0 0 30px currentColor) drop-shadow(0 0 60px currentColor)
-      drop-shadow(0 0 80px currentColor);
-  }
+.hud-hint.is-visible {
+  opacity: 1;
 }
 
-.neon-pulse {
-  animation: neon-pulse 1s ease-in-out infinite;
+.hud-tag {
+  position: absolute;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 4px 9px;
+  border: 1px solid;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  animation: tag-in 0.5s ease-out both;
 }
 
-/* Flicker animation for sci-fi effect */
-@keyframes flicker {
-  0%,
-  19.999%,
-  22%,
-  62.999%,
-  64%,
-  64.999%,
-  70%,
-  100% {
-    opacity: 1;
-  }
-  20%,
-  21.999%,
-  63%,
-  63.999%,
-    64.5%,
-    69.999% {
-    opacity: 0.8;
+.hud-tag.is-highlight {
+  color: var(--accent-ink);
+}
+
+@keyframes tag-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
   }
 }
 
-.flicker {
-  animation: flicker 3s linear infinite;
-}
-
-/* Glow border utility */
-.glow-border-cyan {
-  border: 2px solid #00f0ff;
-  box-shadow:
-    0 0 5px #00f0ff,
-    0 0 10px #00f0ff,
-    inset 0 0 5px rgba(0, 240, 255, 0.2);
-}
-
-.glow-border-pink {
-  border: 2px solid #ff00aa;
-  box-shadow:
-    0 0 5px #ff00aa,
-    0 0 10px #ff00aa,
-    inset 0 0 5px rgba(255, 0, 170, 0.2);
-}
-
-/* Smooth transitions */
-.transition-neon {
+.hud-menu-button {
+  position: absolute;
+  left: 16px;
+  bottom: var(--safe-bottom);
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(5, 8, 12, 0.6);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
   transition:
-    box-shadow 0.3s ease,
-    text-shadow 0.3s ease,
-    filter 0.3s ease;
+    color 0.2s,
+    border-color 0.2s;
 }
 
-/* Grid background pattern */
-.grid-bg {
-  background-image: linear-gradient(
-      rgba(0, 240, 255, 0.03) 1px,
-      transparent 1px
-    ),
-    linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-/* Radial glow background */
-.radial-glow {
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 240, 255, 0.1) 0%,
-    transparent 70%
-  );
-}
-
-/* Countdown subtle pulsing glow background */
-@keyframes glow-pulse {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.05);
-  }
-}
-
-.countdown-glow-bg {
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 240, 255, 0.15) 0%,
-    rgba(191, 0, 255, 0.1) 30%,
-    rgba(255, 0, 170, 0.05) 50%,
-    transparent 70%
-  );
-  animation: glow-pulse 1.5s ease-in-out infinite;
+.hud-menu-button:hover {
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.25);
 }

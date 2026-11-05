@@ -1,5 +1,4 @@
 import type { GameMode, TeamConfig } from "../types"
-import { NeonButton } from "./NeonButton"
 
 interface ModeSelectorProps {
   mode: GameMode
@@ -9,6 +8,9 @@ interface ModeSelectorProps {
   onStart: () => void
 }
 
+const MIN_TEAM_VALUE = 2
+const MAX_TEAM_VALUE = 10
+
 export function ModeSelector({
   mode,
   onModeChange,
@@ -17,272 +19,131 @@ export function ModeSelector({
   onStart,
 }: ModeSelectorProps) {
   const isTeamMode = mode === "team"
-  const showTeamCountControl =
-    isTeamMode && teamConfig.groupingMode === "byTeamCount"
-  const showPlayerCountControl =
-    isTeamMode && teamConfig.groupingMode === "byPlayerCount"
+  const byTeamCount = teamConfig.groupingMode === "byTeamCount"
+  const value = byTeamCount ? teamConfig.teamCount : teamConfig.playersPerTeam
+
+  const selectTeamMode = (groupingMode: TeamConfig["groupingMode"]) => {
+    onModeChange("team")
+    onTeamConfigChange({ ...teamConfig, groupingMode })
+  }
+
+  const changeValue = (delta: number) => {
+    const next = Math.min(MAX_TEAM_VALUE, Math.max(MIN_TEAM_VALUE, value + delta))
+    onTeamConfigChange(
+      byTeamCount
+        ? { ...teamConfig, teamCount: next }
+        : { ...teamConfig, playersPerTeam: next }
+    )
+  }
 
   return (
-    <div className="min-h-dvh flex flex-col z-50 p-6 box-border">
-      {/* Mesh gradient background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+    <div className="relative min-h-dvh flex flex-col p-6 box-border">
+      <div className="flex flex-col flex-1 max-w-md w-full mx-auto">
+        <div className="flex justify-between hud-label">
+          <span>Sys // Picker</span>
+          <span>
+            <span className="text-[var(--accent)]">●</span> Ready
+          </span>
+        </div>
+
+        <h1 className="mt-[clamp(1rem,4.5vh,2.5rem)] mb-[clamp(1rem,4.5vh,2.5rem)] text-6xl font-semibold uppercase leading-[0.92] tracking-wide text-[var(--text)]">
+          Player
+          <br />
+          <span className="text-[var(--accent)] drop-shadow-[0_0_24px_rgba(62,240,255,0.45)]">
+            Picker
+          </span>
+        </h1>
+
+        <div className="hud-label mb-3">// Select mode</div>
+        <div className="flex flex-col gap-2">
+          <ModeOption
+            index="01"
+            active={mode === "standard"}
+            onClick={() => onModeChange("standard")}
+            label="Standard"
+            description="Pick one player"
+          />
+          <ModeOption
+            index="02"
+            active={isTeamMode && byTeamCount}
+            onClick={() => selectTeamMode("byTeamCount")}
+            label="Team Count"
+            description="Split into X teams"
+          />
+          <ModeOption
+            index="03"
+            active={isTeamMode && !byTeamCount}
+            onClick={() => selectTeamMode("byPlayerCount")}
+            label="Team Size"
+            description="X players per team"
+          />
+        </div>
+
+        <div className="flex-1 min-h-4" />
+
+        {/* Numeric selector - only relevant for team modes */}
         <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage: `
-              radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.4) 0%, transparent 50%),
-              radial-gradient(at 100% 0%, rgba(191, 0, 255, 0.3) 0%, transparent 50%),
-              radial-gradient(at 100% 100%, rgba(255, 0, 170, 0.4) 0%, transparent 50%),
-              radial-gradient(at 0% 100%, rgba(0, 150, 255, 0.3) 0%, transparent 50%),
-              radial-gradient(at 50% 50%, rgba(100, 0, 255, 0.2) 0%, transparent 60%)
-            `,
-          }}
-        />
-      </div>
-
-      <div className="relative z-10 flex gap-4 flex-col flex-1 max-w-md w-full mx-auto">
-        {/* Top section - Title and Mode Selection (anchored to top) */}
-        <div className="space-y-8">
-          {/* Title */}
-          <div className="text-center">
-            <h1
-              className="text-6xl md:text-8xl font-bold py-6"
-              style={{
-                background:
-                  "linear-gradient(135deg, #00f0ff 0%, #bf00ff 50%, #ff00aa 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                filter:
-                  "drop-shadow(0 0 30px rgba(0, 240, 255, 0.7)) drop-shadow(0 0 60px rgba(191, 0, 255, 0.5))",
-              }}
-            >
-              Player Picker
-            </h1>
-          </div>
-
-          {/* Mode Selection - Single Column */}
-          <div className="space-y-4">
-            <div className="flex flex-col gap-3">
-              <ModeButton
-                active={mode === "standard"}
-                onClick={() => onModeChange("standard")}
-                label="Standard"
-                description="Pick one player"
-              />
-              <ModeButton
-                active={showTeamCountControl}
-                onClick={() => {
-                  onModeChange("team")
-                  onTeamConfigChange({
-                    ...teamConfig,
-                    groupingMode: "byTeamCount",
-                  })
-                }}
-                label="Team Count"
-                description="Split into X teams"
-              />
-              <ModeButton
-                active={showPlayerCountControl}
-                onClick={() => {
-                  onModeChange("team")
-                  onTeamConfigChange({
-                    ...teamConfig,
-                    groupingMode: "byPlayerCount",
-                  })
-                }}
-                label="Team Size"
-                description="X players per team"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Spacer to push content down */}
-        <div className="flex-1" />
-
-        {/* Bottom section - Numeric selector and Start Button */}
-        <div>
-          {/* Numeric selector - slides up from behind start button */}
-          <div
-            className={`
-              flex justify-center relative z-0
-              transition-all duration-300 ease-in-out
-              ${
-                isTeamMode
-                  ? "opacity-100 max-h-20 mb-0"
-                  : "opacity-0 max-h-0 overflow-hidden"
-              }
-            `}
-          >
-            <div
-              style={{
-                background: "#6b21a8",
-                clipPath:
-                  "polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px)",
-                padding: "1px",
-              }}
-            >
-              <div
-                className="flex items-center justify-center gap-3 p-3"
-                style={{
-                  background: "#0a0a0f",
-                  clipPath:
-                    "polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%, 0 10px)",
-                }}
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isTeamMode ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
+          }`}
+          aria-hidden={!isTeamMode}
+        >
+          <div className="flex items-center justify-between border-t border-[var(--line)] py-4 mb-2">
+            <span className="hud-label">{byTeamCount ? "Teams" : "Players per team"}</span>
+            <div className="flex items-center gap-4">
+              <button
+                className="stepper-button"
+                onClick={() => changeValue(-1)}
+                disabled={value <= MIN_TEAM_VALUE}
+                tabIndex={isTeamMode ? 0 : -1}
+                aria-label="Decrease"
               >
-                <div
-                  style={{
-                    background: "#a855f7",
-                    clipPath:
-                      "polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px)",
-                    padding: "1px",
-                  }}
-                >
-                  <button
-                    onClick={() => {
-                      if (showTeamCountControl) {
-                        onTeamConfigChange({
-                          ...teamConfig,
-                          teamCount: Math.max(2, teamConfig.teamCount - 1),
-                        })
-                      } else {
-                        onTeamConfigChange({
-                          ...teamConfig,
-                          playersPerTeam: Math.max(
-                            2,
-                            teamConfig.playersPerTeam - 1
-                          ),
-                        })
-                      }
-                    }}
-                    className="w-8 h-8 text-purple-400 text-lg hover:bg-purple-500/20 transition-colors flex items-center justify-center"
-                    style={{
-                      background: "#0a0a0f",
-                      clipPath:
-                        "polygon(6px 0, 100% 0, 100% 100%, 0 100%, 0 6px)",
-                    }}
-                  >
-                    -
-                  </button>
-                </div>
-                <div className="text-2xl font-bold text-purple-400 w-10 text-center">
-                  {showTeamCountControl
-                    ? teamConfig.teamCount
-                    : teamConfig.playersPerTeam}
-                </div>
-                <div
-                  style={{
-                    background: "#a855f7",
-                    clipPath:
-                      "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
-                    padding: "1px",
-                  }}
-                >
-                  <button
-                    onClick={() => {
-                      if (showTeamCountControl) {
-                        onTeamConfigChange({
-                          ...teamConfig,
-                          teamCount: Math.min(10, teamConfig.teamCount + 1),
-                        })
-                      } else {
-                        onTeamConfigChange({
-                          ...teamConfig,
-                          playersPerTeam: Math.min(
-                            10,
-                            teamConfig.playersPerTeam + 1
-                          ),
-                        })
-                      }
-                    }}
-                    className="w-8 h-8 text-purple-400 text-lg hover:bg-purple-500/20 transition-colors flex items-center justify-center"
-                    style={{
-                      background: "#0a0a0f",
-                      clipPath:
-                        "polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)",
-                    }}
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
+                −
+              </button>
+              <span className="w-6 text-center text-2xl font-semibold text-[var(--text)]">
+                {value}
+              </span>
+              <button
+                className="stepper-button"
+                onClick={() => changeValue(1)}
+                disabled={value >= MAX_TEAM_VALUE}
+                tabIndex={isTeamMode ? 0 : -1}
+                aria-label="Increase"
+              >
+                +
+              </button>
             </div>
           </div>
-
-          {/* Start Button */}
-          <div className="relative z-10 -mt-4">
-            <NeonButton
-              onClick={onStart}
-              color="cyan"
-              size="lg"
-              className="w-full py-4 text-xl"
-            >
-              Start
-            </NeonButton>
-          </div>
         </div>
+
+        <button onClick={onStart} className="start-button chamfer">
+          Start
+        </button>
       </div>
     </div>
   )
 }
 
-interface ModeButtonProps {
+interface ModeOptionProps {
+  index: string
   active: boolean
   onClick: () => void
   label: string
   description: string
 }
 
-function ModeButton({ active, onClick, label, description }: ModeButtonProps) {
-  const borderColor = active ? "#00f0ff" : "#475569"
-
+function ModeOption({ index, active, onClick, label, description }: ModeOptionProps) {
   return (
-    <div
-      className="relative"
-      style={{
-        background: borderColor,
-        clipPath:
-          "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
-        padding: "1px",
-      }}
+    <button
+      onClick={onClick}
+      aria-pressed={active}
+      className={`mode-option ${active ? "is-active" : ""}`}
     >
-      <button
-        onClick={onClick}
-        className={`
-          relative w-full p-4 text-center transition-all duration-300
-          backdrop-blur-sm
-          ${active ? "bg-cyan-950/90" : "bg-[#0a0a0f] hover:bg-[#0f0f18]"}
-        `}
-        style={{
-          clipPath:
-            "polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)",
-          boxShadow: active
-            ? "0 0 20px rgba(0, 240, 255, 0.3), inset 0 0 30px rgba(0, 240, 255, 0.1)"
-            : "none",
-        }}
-      >
-        {/* Scan line effect */}
-        {active && (
-          <div
-            className="absolute inset-0 opacity-10 pointer-events-none"
-            style={{
-              background:
-                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.3) 2px, rgba(0, 240, 255, 0.3) 4px)",
-            }}
-          />
-        )}
-
-        <div
-          className={`relative font-bold tracking-wide uppercase text-sm ${active ? "text-cyan-400" : "text-slate-300"}`}
-        >
-          {label}
-        </div>
-        <div
-          className={`relative text-xs mt-1 ${active ? "text-cyan-500/70" : "text-slate-500"}`}
-        >
-          {description}
-        </div>
-      </button>
-    </div>
+      <span className="mode-option__index">{index}</span>
+      <span>
+        <span className="mode-option__label">{label}</span>
+        <span className="mode-option__desc">{description}</span>
+      </span>
+    </button>
   )
 }

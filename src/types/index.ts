@@ -31,18 +31,18 @@ export interface GameState {
   teams: TouchPoint[][]
 }
 
-// Neon colors for players
+// Player colours: bright, distinct hues that read well against deep space
 export const NEON_COLORS = [
-  "#00f0ff", // Cyan
-  "#ff00aa", // Pink
-  "#00ff88", // Green
-  "#ffff00", // Yellow
-  "#ff6600", // Orange
-  "#aa00ff", // Purple
-  "#ff0066", // Red-Pink
-  "#00ffcc", // Teal
-  "#ff99ff", // Light Pink
-  "#66ff00", // Lime
+  "#3ef0ff", // Cyan
+  "#ff3fb4", // Pink
+  "#8dff5a", // Lime
+  "#ffc93e", // Amber
+  "#9d6bff", // Violet
+  "#ff7a3e", // Orange
+  "#3effb0", // Mint
+  "#ff5c5c", // Red
+  "#5c8dff", // Blue
+  "#f2ff3e", // Yellow
 ]
 
 export const getPlayerColor = (index: number): string => {

@@ -2,8 +2,14 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import type { TouchPoint, GameMode, GamePhase, TeamConfig } from "./types"
 import { NEON_COLORS } from "./types"
 import { TouchArea } from "./components/TouchArea"
-import { Countdown } from "./components/Countdown"
+import { GameHud, type ResultTag } from "./components/GameHud"
 import { ModeSelector } from "./components/ModeSelector"
+import { ParticleCanvas } from "./components/ParticleCanvas"
+import {
+  type ParticleField,
+  type FieldPhase,
+  resultHaloRadius,
+} from "./particles/ParticleField"
 
 const COUNTDOWN_START = 3
 const MIN_PLAYERS = 2
@@ -12,8 +18,9 @@ function App() {
   const [phase, setPhase] = useState<GamePhase>("waiting")
   const [mode, setMode] = useState<GameMode>("standard")
   const [touchPoints, setTouchPoints] = useState<TouchPoint[]>([])
-  const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [_selectedTeam, setSelectedTeam] = useState<number | null>(null)
+  const [winnerIds, setWinnerIds] = useState<number[]>([])
+  const [selectedTeam, setSelectedTeam] = useState<number | null>(null)
+  const [field, setField] = useState<ParticleField | null>(null)
   const [countdown, setCountdown] = useState(COUNTDOWN_START)
   const [showMenu, setShowMenu] = useState(true)
   const [teamConfig, setTeamConfig] = useState<TeamConfig>({
@@ -39,7 +46,7 @@ function App() {
   const resetGame = useCallback(() => {
     clearCountdown()
     setPhase("waiting")
-    setSelectedId(null)
+    setWinnerIds([])
     setSelectedTeam(null)
     setCountdown(COUNTDOWN_START)
     setTouchPoints([])
@@ -62,15 +69,13 @@ function App() {
           : Math.ceil(allPoints.length / teamConfig.playersPerTeam)
       const winningTeam = Math.floor(Math.random() * numTeams)
       setSelectedTeam(winningTeam)
-      // Select first player of winning team for visual
-      const winningPlayer = teamsAssigned.find((p) => p.team === winningTeam)
-      if (winningPlayer) {
-        setSelectedId(winningPlayer.id)
-      }
+      setWinnerIds(
+        teamsAssigned.filter((p) => p.team === winningTeam).map((p) => p.id)
+      )
     } else {
       // Standard or single player mode
       const randomIndex = Math.floor(Math.random() * allPoints.length)
-      setSelectedId(allPoints[randomIndex].id)
+      setWinnerIds([allPoints[randomIndex].id])
     }
 
     setPhase("result")
@@ -210,72 +215,79 @@ function App() {
     }
   }, [phase, touchPoints.length, minPlayers, startCountdown])
 
-  if (showMenu) {
-    return (
-      <main className="min-h-screen overflow-auto">
-        <ModeSelector
-          mode={mode}
-          onModeChange={setMode}
-          teamConfig={teamConfig}
-          onTeamConfigChange={setTeamConfig}
-          onStart={handleStart}
-        />
-      </main>
-    )
-  }
+  // Keep the particle field in sync with the players on screen
+  useEffect(() => {
+    field?.setFingers(touchPoints)
+  }, [field, touchPoints])
+
+  useEffect(() => {
+    const fieldPhase: FieldPhase =
+      phase === "countdown" ? "countdown" : phase === "result" ? "result" : "gather"
+    field?.setPhase(fieldPhase, { winnerIds, countdownSeconds: COUNTDOWN_START })
+  }, [field, phase, winnerIds])
+
+  const isTeamResult = mode === "team" && phase === "result"
+  const resultTags: ResultTag[] =
+    phase === "result" && field
+      ? touchPoints.flatMap((p) => {
+          const pos = field.getFingerPosition(p.id) ?? p
+          const won = winnerIds.includes(p.id)
+          if (!isTeamResult && !won) return []
+          return [
+            {
+              id: p.id,
+              x: pos.x,
+              y: pos.y,
+              color: p.color,
+              highlight: won,
+              label: isTeamResult
+                ? `Team ${(p.team ?? 0) + 1}${p.team === selectedTeam ? " · Selected" : ""}`
+                : "Selected",
+            },
+          ]
+        })
+      : []
+
+  const modeLabel =
+    mode === "standard"
+      ? "Standard"
+      : teamConfig.groupingMode === "byTeamCount"
+        ? `${teamConfig.teamCount} teams`
+        : `Teams of ${teamConfig.playersPerTeam}`
 
   return (
-    <main className="fixed inset-0 overflow-hidden">
-      {/* Mesh gradient background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute inset-0 opacity-40"
-          style={{
-            backgroundImage: `
-              radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.4) 0%, transparent 50%),
-              radial-gradient(at 100% 0%, rgba(191, 0, 255, 0.3) 0%, transparent 50%),
-              radial-gradient(at 100% 100%, rgba(255, 0, 170, 0.4) 0%, transparent 50%),
-              radial-gradient(at 0% 100%, rgba(0, 150, 255, 0.3) 0%, transparent 50%),
-              radial-gradient(at 50% 50%, rgba(100, 0, 255, 0.2) 0%, transparent 60%)
-            `,
-          }}
-        />
-      </div>
+    <>
+      <ParticleCanvas onReady={setField} />
 
-      <TouchArea
-        touchPoints={touchPoints}
-        onTouchChange={handleTouchChange}
-        selectedId={selectedId}
-        showTeams={mode === "team" && phase === "result"}
-        disabled={phase === "result"}
-        isWaiting={phase === "ready" || phase === "countdown"}
-      />
-
-      <Countdown count={countdown} isVisible={phase === "countdown"} />
-
-      {/* Back button */}
-      <div className="fixed bottom-4 left-4 z-40">
-        <button
-          onClick={handleRestart}
-          className="px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm border border-slate-700/50 text-slate-400 hover:text-slate-200 hover:border-slate-600 text-sm transition-colors flex items-center gap-1.5"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5" />
-            <path d="M12 19l-7-7 7-7" />
-          </svg>
-          Menu
-        </button>
-      </div>
-    </main>
+      {showMenu ? (
+        <main className="relative min-h-screen overflow-auto">
+          <ModeSelector
+            mode={mode}
+            onModeChange={setMode}
+            teamConfig={teamConfig}
+            onTeamConfigChange={setTeamConfig}
+            onStart={handleStart}
+          />
+        </main>
+      ) : (
+        <main className="fixed inset-0 overflow-hidden">
+          <TouchArea
+            field={field}
+            onTouchChange={handleTouchChange}
+            disabled={phase === "result"}
+          />
+          <GameHud
+            phase={phase}
+            playerCount={touchPoints.length}
+            countdown={countdown}
+            modeLabel={modeLabel}
+            tags={resultTags}
+            tagOffset={resultHaloRadius(winnerIds.length) + 16}
+            onMenu={handleRestart}
+          />
+        </main>
+      )}
+    </>
   )
 }
 
