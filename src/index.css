@@ -10,10 +10,17 @@
   --accent: #3ef0ff;
   --accent-ink: #031418;
   --text: #e8f7fb;
-  --text-dim: #9fb0b6;
-  --text-faint: #56707a;
+  --text-dim: #b8c6cb;
+  --text-faint: #7a919a;
   --line: rgba(255, 255, 255, 0.08);
-  --panel: rgba(5, 8, 12, 0.6);
+
+  /* Frosted glass for interactive elements: blurs the particles behind text */
+  --glass-fill:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
+    rgba(8, 12, 18, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-blur: blur(14px) saturate(140%);
+  --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.08);
   --safe-top: max(14px, env(safe-area-inset-top));
   --safe-bottom: max(16px, env(safe-area-inset-bottom));
 }
@@ -91,20 +98,28 @@ button:focus-visible {
   width: 100%;
   padding: 14px 16px;
   text-align: left;
-  border: 1px solid var(--line);
-  background: var(--panel);
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shine);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   transition:
     border-color 0.2s,
     background-color 0.2s;
 }
 
 .mode-option:hover {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .mode-option.is-active {
   border-color: rgba(62, 240, 255, 0.4);
-  background: linear-gradient(90deg, rgba(62, 240, 255, 0.12), rgba(62, 240, 255, 0.02)), var(--panel);
+  background:
+    linear-gradient(90deg, rgba(62, 240, 255, 0.16), rgba(62, 240, 255, 0.03)),
+    var(--glass-fill);
+  box-shadow:
+    var(--glass-shine),
+    0 0 24px rgba(62, 240, 255, 0.12);
 }
 
 .mode-option.is-active::before {
@@ -121,7 +136,7 @@ button:focus-visible {
 .mode-option__index {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: #3d4f56;
+  color: #5d727a;
 }
 
 .mode-option__label {
@@ -150,14 +165,18 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--glass-fill);
   border: 1px solid rgba(62, 240, 255, 0.35);
+  box-shadow: var(--glass-shine);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   color: var(--accent);
   font-size: 18px;
-  transition: background-color 0.15s;
+  transition: border-color 0.15s;
 }
 
 .stepper-button:hover:not(:disabled) {
-  background: rgba(62, 240, 255, 0.12);
+  border-color: rgba(62, 240, 255, 0.7);
 }
 
 .stepper-button:disabled {
@@ -269,6 +288,9 @@ button:focus-visible {
   white-space: nowrap;
   padding: 4px 9px;
   border: 1px solid;
+  background: var(--glass-fill);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
@@ -292,14 +314,17 @@ button:focus-visible {
   position: absolute;
   left: 16px;
   bottom: var(--safe-bottom);
-  padding: 7px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(5, 8, 12, 0.6);
+  padding: 9px 14px;
+  background: var(--glass-fill);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shine);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--text-dim);
   transition:
     color 0.2s,
     border-color 0.2s;
