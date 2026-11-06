@@ -14,13 +14,15 @@
   --text-faint: #7a919a;
   --line: rgba(255, 255, 255, 0.08);
 
-  /* Frosted glass for interactive elements: blurs the particles behind text */
+  /* Glass for interactive elements: a light frost softens the particles
+     behind text while still letting them show through */
   --glass-fill:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
-    rgba(8, 12, 18, 0.5);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-blur: blur(14px) saturate(140%);
-  --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01)),
+    rgba(8, 12, 18, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-blur: blur(3px) saturate(160%);
+  --glass-shine: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  --glass-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
   --safe-top: max(14px, env(safe-area-inset-top));
   --safe-bottom: max(16px, env(safe-area-inset-bottom));
 }
@@ -139,6 +141,12 @@ button:focus-visible {
   color: #5d727a;
 }
 
+.mode-option__label,
+.mode-option__desc,
+.mode-option__index {
+  text-shadow: var(--glass-text-shadow);
+}
+
 .mode-option__label {
   display: block;
   font-size: 15px;
@@ -160,6 +168,7 @@ button:focus-visible {
 }
 
 .stepper-button {
+  text-shadow: var(--glass-text-shadow);
   width: 36px;
   height: 36px;
   display: flex;
@@ -193,16 +202,16 @@ button:focus-visible {
 .start-wrap::before {
   content: "";
   position: absolute;
-  inset: 6px 10px;
-  background: rgba(62, 240, 255, 0.35);
-  filter: blur(18px);
-  opacity: 0.6;
+  inset: 10px 16px;
+  background: rgba(62, 240, 255, 0.3);
+  filter: blur(20px);
+  opacity: 0.3;
   transition: opacity 0.2s;
   pointer-events: none;
 }
 
 .start-wrap:hover::before {
-  opacity: 0.9;
+  opacity: 0.5;
 }
 
 .start-button {
@@ -223,11 +232,13 @@ button:focus-visible {
   letter-spacing: 0.35em;
   text-indent: 0.35em;
   text-transform: uppercase;
-  text-shadow: 0 0 12px rgba(62, 240, 255, 0.6);
+  text-shadow:
+    0 0 12px rgba(62, 240, 255, 0.6),
+    var(--glass-text-shadow);
   background:
-    linear-gradient(180deg, rgba(62, 240, 255, 0.2), rgba(62, 240, 255, 0.06)),
-    rgba(8, 12, 18, 0.5);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    linear-gradient(180deg, rgba(62, 240, 255, 0.11), rgba(62, 240, 255, 0.02)),
+    rgba(8, 12, 18, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
   -webkit-backdrop-filter: var(--glass-blur);
   backdrop-filter: var(--glass-blur);
   transition: transform 0.1s;
@@ -240,19 +251,29 @@ button:focus-visible {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  --corner: linear-gradient(
+  /* The clip-path diagonal runs through the middle of each corner square, so
+     the stroke sits just inside it rather than being half clipped away */
+  --corner-top-left: linear-gradient(
     to bottom right,
-    transparent calc(50% - 0.75px),
-    var(--edge) 50%,
-    transparent calc(50% + 0.75px)
+    transparent 50%,
+    var(--edge-bright) calc(50% + 0.25px),
+    var(--edge-bright) calc(50% + 1.25px),
+    transparent calc(50% + 1.6px)
+  );
+  --corner-bottom-right: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 1.6px),
+    var(--edge) calc(50% - 1.25px),
+    var(--edge) calc(50% - 0.25px),
+    transparent 50%
   );
   background:
     linear-gradient(90deg, var(--edge-bright), var(--edge)) var(--cut) 0 / calc(100% - var(--cut)) 1px no-repeat,
     linear-gradient(var(--edge), var(--edge)) 100% 0 / 1px calc(100% - var(--cut)) no-repeat,
     linear-gradient(var(--edge), var(--edge)) 0 100% / calc(100% - var(--cut)) 1px no-repeat,
     linear-gradient(var(--edge-bright), var(--edge)) 0 var(--cut) / 1px calc(100% - var(--cut)) no-repeat,
-    var(--corner) 0 0 / var(--cut) var(--cut) no-repeat,
-    var(--corner) 100% 100% / var(--cut) var(--cut) no-repeat;
+    var(--corner-top-left) 0 0 / var(--cut) var(--cut) no-repeat,
+    var(--corner-bottom-right) 100% 100% / var(--cut) var(--cut) no-repeat;
 }
 
 /* Slow light sweep to draw the eye */
@@ -399,6 +420,7 @@ button:focus-visible {
 }
 
 .hud-menu-button {
+  text-shadow: var(--glass-text-shadow);
   position: absolute;
   left: 16px;
   bottom: var(--safe-bottom);
