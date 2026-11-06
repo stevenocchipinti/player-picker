@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import type { GameMode, TeamConfig } from "../types"
 import { Logo } from "./Logo"
 
@@ -37,14 +38,40 @@ export function ModeSelector({
     )
   }
 
+  const stepper = (
+    <>
+      <span className="mode-option__tray-label">
+        {byTeamCount ? "Teams" : "Players per team"}
+      </span>
+      <div className="flex items-center gap-3">
+        <button
+          className="stepper-button"
+          onClick={() => changeValue(-1)}
+          disabled={value <= MIN_TEAM_VALUE}
+          aria-label="Decrease"
+        >
+          −
+        </button>
+        <span className="mode-option__value" aria-live="polite">
+          {value}
+        </span>
+        <button
+          className="stepper-button"
+          onClick={() => changeValue(1)}
+          disabled={value >= MAX_TEAM_VALUE}
+          aria-label="Increase"
+        >
+          +
+        </button>
+      </div>
+    </>
+  )
+
   return (
     <div className="relative min-h-dvh flex flex-col p-6 box-border">
       <div className="flex flex-col flex-1 max-w-md w-full mx-auto">
-        <div className="flex items-center justify-between hud-label">
+        <div className="flex items-center">
           <Logo size={30} />
-          <span>
-            <span className="text-[var(--accent)]">●</span> Ready
-          </span>
         </div>
 
         <h1 className="mt-[clamp(1rem,4.5vh,2.5rem)] mb-[clamp(1rem,4.5vh,2.5rem)] text-6xl font-semibold uppercase leading-[0.92] tracking-wide text-[var(--text)]">
@@ -70,6 +97,7 @@ export function ModeSelector({
             onClick={() => selectTeamMode("byTeamCount")}
             label="Team Count"
             description="Split into X teams"
+            controls={stepper}
           />
           <ModeOption
             index="03"
@@ -77,45 +105,11 @@ export function ModeSelector({
             onClick={() => selectTeamMode("byPlayerCount")}
             label="Team Size"
             description="X players per team"
+            controls={stepper}
           />
         </div>
 
         <div className="flex-1 min-h-4" />
-
-        {/* Numeric selector - only relevant for team modes */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            isTeamMode ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
-          }`}
-          aria-hidden={!isTeamMode}
-        >
-          <div className="flex items-center justify-between border-t border-[var(--line)] py-4 mb-2">
-            <span className="hud-label">{byTeamCount ? "Teams" : "Players per team"}</span>
-            <div className="flex items-center gap-4">
-              <button
-                className="stepper-button"
-                onClick={() => changeValue(-1)}
-                disabled={value <= MIN_TEAM_VALUE}
-                tabIndex={isTeamMode ? 0 : -1}
-                aria-label="Decrease"
-              >
-                −
-              </button>
-              <span className="w-6 text-center text-2xl font-semibold text-[var(--text)]">
-                {value}
-              </span>
-              <button
-                className="stepper-button"
-                onClick={() => changeValue(1)}
-                disabled={value >= MAX_TEAM_VALUE}
-                tabIndex={isTeamMode ? 0 : -1}
-                aria-label="Increase"
-              >
-                +
-              </button>
-            </div>
-          </div>
-        </div>
 
         <div className="start-wrap">
           <button onClick={onStart} className="start-button chamfer">
@@ -136,20 +130,37 @@ interface ModeOptionProps {
   onClick: () => void
   label: string
   description: string
+  /** Settings shown inside the card while this mode is selected */
+  controls?: ReactNode
 }
 
-function ModeOption({ index, active, onClick, label, description }: ModeOptionProps) {
+function ModeOption({
+  index,
+  active,
+  onClick,
+  label,
+  description,
+  controls,
+}: ModeOptionProps) {
+  const expanded = active && !!controls
   return (
-    <button
-      onClick={onClick}
-      aria-pressed={active}
-      className={`mode-option ${active ? "is-active" : ""}`}
+    <div
+      className={`mode-option ${active ? "is-active" : ""} ${expanded ? "is-expanded" : ""}`}
     >
-      <span className="mode-option__index">{index}</span>
-      <span>
-        <span className="mode-option__label">{label}</span>
-        <span className="mode-option__desc">{description}</span>
-      </span>
-    </button>
+      <button onClick={onClick} aria-pressed={active} className="mode-option__select">
+        <span className="mode-option__index">{index}</span>
+        <span>
+          <span className="mode-option__label">{label}</span>
+          <span className="mode-option__desc">{description}</span>
+        </span>
+      </button>
+      {controls && (
+        <div className="mode-option__controls" inert={!expanded}>
+          <div>
+            <div className="mode-option__tray">{controls}</div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

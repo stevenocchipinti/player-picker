@@ -92,14 +92,10 @@ button:focus-visible {
 
 /* ---- Menu ---------------------------------------------------------------- */
 
+/* A mode card: the select button, plus a tray of controls that slides open
+   when the mode is active and has settings */
 .mode-option {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  padding: 14px 16px;
-  text-align: left;
   background: var(--glass-fill);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shine);
@@ -122,6 +118,58 @@ button:focus-visible {
   box-shadow:
     var(--glass-shine),
     0 0 24px rgba(62, 240, 255, 0.12);
+}
+
+.mode-option__select {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  text-align: left;
+}
+
+.mode-option__controls {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.mode-option.is-expanded .mode-option__controls {
+  grid-template-rows: 1fr;
+}
+
+.mode-option__controls > div {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Solid tray so the controls never sit on the see-through glass */
+.mode-option__tray {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 12px 12px;
+  padding: 8px 8px 8px 14px;
+  background: rgba(4, 7, 11, 0.78);
+  border: 1px solid rgba(62, 240, 255, 0.18);
+}
+
+.mode-option__tray-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.mode-option__value {
+  width: 28px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .mode-option.is-active::before {
