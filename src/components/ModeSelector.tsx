@@ -1,4 +1,5 @@
 import type { GameMode, TeamConfig } from "../types"
+import { Logo } from "./Logo"
 
 interface ModeSelectorProps {
   mode: GameMode
@@ -39,8 +40,8 @@ export function ModeSelector({
   return (
     <div className="relative min-h-dvh flex flex-col p-6 box-border">
       <div className="flex flex-col flex-1 max-w-md w-full mx-auto">
-        <div className="flex justify-between hud-label">
-          <span>Sys // Picker</span>
+        <div className="flex items-center justify-between hud-label">
+          <Logo size={30} />
           <span>
             <span className="text-[var(--accent)]">●</span> Ready
           </span>
@@ -116,9 +117,14 @@ export function ModeSelector({
           </div>
         </div>
 
-        <button onClick={onStart} className="start-button chamfer">
-          Start
-        </button>
+        <div className="start-wrap">
+          <button onClick={onStart} className="start-button chamfer">
+            Start
+            <span className="start-button__arrow" aria-hidden="true">
+              ▸
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   )
